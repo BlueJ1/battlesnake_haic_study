@@ -23,22 +23,22 @@
       {
         "name": "chickensnake",
         "directory": "./example_snakes/chickensnake",
-        "port": 7126
+        "port": 7127
       },
       {
         "name": "coding-badly-tron",
         "directory": "./example_snakes/coding-badly-tron",
-        "port": 7127
+        "port": 7128
       },
       {
         "name": "DD2438-BattleSnake",
         "directory": "./example_snakes/DD2438-BattleSnake",
-        "port": 7128
+        "port": 7129
       },
       {
         "name": "BattleSnake2023",
         "directory": "./example_snakes/BattleSnake2023",
-        "port": 7129
+        "port": 7130
       }
     ],
     "base_port": 7123,
