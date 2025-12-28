@@ -16,14 +16,6 @@ services:
     - PORT=7124
     - SNAKE_NAME=DefensiveGuardian
     container_name: defensiveguardian-test
-  oliver-king-snake-service:
-    build: ./example_snakes/oliver-king-snake
-    ports:
-    - 7126:7126
-    environment:
-    - PORT=7126
-    - SNAKE_NAME=oliver-king-snake
-    container_name: oliver-king-snake-test
   untimely-neglected-wearable-service:
     build: ./example_snakes/untimely-neglected-wearable
     ports:
@@ -32,19 +24,27 @@ services:
     - PORT=7125
     - SNAKE_NAME=untimely-neglected-wearable
     container_name: untimely-neglected-wearable-test
-  chickensnake-service:
-    build: ./example_snakes/chickensnake
+  oliver-king-snake-service:
+    build: ./example_snakes/oliver-king-snake
+    ports:
+    - 7126:7126
+    environment:
+    - PORT=7126
+    - SNAKE_NAME=oliver-king-snake
+    container_name: oliver-king-snake-test
+  mikesnake-service:
+    build: ./example_snakes/MikeSnake
     ports:
     - 7127:7127
     environment:
     - PORT=7127
-    - SNAKE_NAME=chickensnake
-    container_name: chickensnake-test
-  coding-badly-tron-service:
-    build: ./example_snakes/coding-badly-tron
+    - SNAKE_NAME=MikeSnake
+    container_name: mikesnake-test
+  cardinalsnake-service:
+    build: ./example_snakes/CardinalSnake
     ports:
     - 7128:7128
     environment:
     - PORT=7128
-    - SNAKE_NAME=coding-badly-tron
-    container_name: coding-badly-tron-test
+    - SNAKE_NAME=CardinalSnake
+    container_name: cardinalsnake-test

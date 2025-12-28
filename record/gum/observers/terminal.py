@@ -219,13 +219,13 @@ class TerminalObserver(Observer):
 
         if self._proc_available:
             log.info(
-                f"✓ /proc monitoring enabled - polling every {self.proc_poll_interval}s for real-time capture"
+                f"[OK] /proc monitoring enabled - polling every {self.proc_poll_interval}s for real-time capture"
             )
         else:
             # Warn about bash history limitation only if /proc isn't available
             if self.history_file and "bash" in str(self.history_file):
                 log.warning(
-                    "⚠️  Terminal capture limitation: Bash history is only written when shell sessions end, "
+                    "[!] Terminal capture limitation: Bash history is only written when shell sessions end, "
                     "not in real-time. Commands run in other terminal sessions won't be captured until "
                     "those sessions exit."
                 )
@@ -575,7 +575,7 @@ class TerminalObserver(Observer):
             )
         )
 
-        logger.info(f"🤖 Started monitoring {tool_name} session (PID: {pid})")
+        logger.info(f"[AI] Started monitoring {tool_name} session (PID: {pid})")
         logger.info(f"   Session log: {session_file}")
 
     async def _capture_ai_cli_output(self, pid: int) -> Optional[str]:
@@ -664,7 +664,7 @@ class TerminalObserver(Observer):
             )
 
             logger.info(
-                f"🤖 {session['tool']} session ended (PID: {pid}, Duration: {duration:.1f}s)"
+                f"[AI] {session['tool']} session ended (PID: {pid}, Duration: {duration:.1f}s)"
             )
 
     def _get_process_ptys(self) -> Dict[int, str]:

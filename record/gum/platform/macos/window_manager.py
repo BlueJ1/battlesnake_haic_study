@@ -33,7 +33,7 @@ class MacOSWindowManager(WindowManagerBase):
         return min_x, min_y, max_x, max_y
 
     def get_visible_windows(self) -> List[Dict[str, Any]]:
-        """List *onscreen* windows with their visible‑area ratio."""
+        """List *onscreen* windows with their visible-area ratio."""
         _, _, _, gmax_y = self.get_display_bounds()
 
         opts = Quartz.kCGWindowListOptionOnScreenOnly | Quartz.kCGWindowListOptionIncludingWindow
@@ -57,7 +57,7 @@ class MacOSWindowManager(WindowManagerBase):
             if w <= 0 or h <= 0:
                 continue
 
-            inv_y = gmax_y - y - h  # Quartz→Shapely Y‑flip
+            inv_y = gmax_y - y - h  # Quartz->Shapely Y-flip
             poly = box(x, inv_y, x + w, inv_y + h)
             if poly.is_empty:
                 continue

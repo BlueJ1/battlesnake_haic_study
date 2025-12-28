@@ -159,7 +159,7 @@ class TrueSkillTournament:
                     self.ratings[snake1], self.ratings[snake2], drawn=True
                 )
 
-        print("✓ TrueSkill ratings calculated\n")
+        print("[OK] TrueSkill ratings calculated\n")
 
     def _parse_game_winner(self, game_file, snake1_name, snake2_name):
         """Parse a game file to determine the winner"""
@@ -208,8 +208,8 @@ class TrueSkillTournament:
         for rank, (snake_name, rating) in enumerate(ranked, 1):
             conservative_skill = rating.mu - 3 * rating.sigma
             print(f"{rank}. {snake_name}")
-            print(f"   μ (mean): {rating.mu:.2f}")
-            print(f"   σ (uncertainty): {rating.sigma:.2f}")
+            print(f"   mu (mean): {rating.mu:.2f}")
+            print(f"   sigma (uncertainty): {rating.sigma:.2f}")
             print(f"   Conservative skill: {conservative_skill:.2f}")
             print()
 

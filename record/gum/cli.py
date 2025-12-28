@@ -139,7 +139,7 @@ async def _main():
         if args.region or args.fullscreen:
             # User explicitly wants GUI capture, respect that
             print("\n" + "=" * 70)
-            print("⚠️  WAYLAND DETECTED - GUI CAPTURE MAY BE LIMITED")
+            print("[!] WAYLAND DETECTED - GUI CAPTURE MAY BE LIMITED")
             print("=" * 70)
             print("Wayland restricts screen capture for security.")
             print("You may experience issues with screenshot capture.")
@@ -148,7 +148,7 @@ async def _main():
         else:
             # Auto-enable terminal-only mode on Wayland
             print("\n" + "=" * 70)
-            print("🔍 WAYLAND DETECTED - AUTO-ENABLING TERMINAL-ONLY MODE")
+            print("WAYLAND DETECTED - AUTO-ENABLING TERMINAL-ONLY MODE")
             print("=" * 70)
             print("Wayland restricts GUI/screenshot capture for security.")
             print("Automatically switching to terminal-only mode for best results.")
@@ -161,12 +161,12 @@ async def _main():
     print(f"User Name: {args.user_name}")
     # Display warning message before starting recording
     print("\n" + "=" * 70)
-    print("⚠️  BEFORE YOU BEGIN RECORDING")
+    print("[!] BEFORE YOU BEGIN RECORDING")
     print("=" * 70)
     print("\nPlease make sure your workspace is clean and contains only")
     print("study-related materials.")
     print("\nClose all personal tabs, folders, and unrelated applications.")
-    print("\nOnly the window you select will be recorded — activity outside")
+    print("\nOnly the window you select will be recorded - activity outside")
     print("it will be ignored.")
     print("\nYou can pause or stop recording at any time using Ctrl + C")
     print("in the terminal.")
@@ -317,7 +317,7 @@ async def _main():
     try:
         async with gum(args.user_name, *observers, data_directory=data_directory):
             print("\n" + "=" * 70)
-            print("🔴 RECORDING IN PROGRESS")
+            print("RECORDING IN PROGRESS")
             print("=" * 70)
             print("Press Ctrl+C to stop recording...")
             print("=" * 70 + "\n")
@@ -335,10 +335,10 @@ async def _main():
             pass
 
         print("\n\n" + "=" * 70)
-        print("⏹️  Recording stopped")
+        print("Recording stopped")
         print("=" * 70)
         print(f"\nData saved in: {data_directory}/")
-        print("\n📋 Next steps:")
+        print("\nNext steps:")
         print("  1. Review recording:  python review_recording.py")
         print("  2. Submit to GCS:     python submit_recordings.py")
         print("=" * 70)

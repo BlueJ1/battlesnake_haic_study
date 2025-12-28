@@ -5,29 +5,20 @@
 #  |    |   \ / __ \|  |  |  | |  |_\  ___/ \___ \|   |  \/ __ \|    <\  ___/
 #  |________/(______/__|  |__| |____/\_____>______>___|__(______/__|__\\_____>
 #
-# 完全增强版 - 应用了所有关键补丁
-# 版本: v1.2-fully-patched
-#
-# 主要改进:
-# ✅ 补丁1: 动态洪水填充深度(P0)
-# ✅ 补丁2: 增强紧急猎杀判断(P0)
-# ✅ 补丁3: 2步头对头预测(P1)
-# ✅ 补丁4: 智能食物选择(P1)
-# ✅ 补丁5: 动态进攻阈值(P2)
 
 import random
 import typing
 from collections import deque
 
 # ============================================================================
-# STRATEGY CONFIGURATION - 动态策略配置
+# STRATEGY CONFIGURATION
 # ============================================================================
 
-# 注意: 这些是默认值,会被动态调整函数覆盖
-AGGRESSIVE_LENGTH_THRESHOLD = 8  # 进攻模式阈值(会被动态调整)
-LOW_HEALTH_THRESHOLD = 30  # 觅食阈值
-CRITICAL_HEALTH_THRESHOLD = 15  # 紧急阈值
-HUNT_REWARD_THRESHOLD = 3  # 猎杀收益阈值
+# Note: These are default values, will be dynamically adjusted by functions
+AGGRESSIVE_LENGTH_THRESHOLD = 8  # Aggressive mode threshold (will be dynamically adjusted)
+LOW_HEALTH_THRESHOLD = 30  # Food seeking threshold
+CRITICAL_HEALTH_THRESHOLD = 15  # Critical threshold
+HUNT_REWARD_THRESHOLD = 3  # Hunt reward threshold
 
 
 # ============================================================================
@@ -54,7 +45,7 @@ def end(game_state: typing.Dict):
 
 
 def move(game_state: typing.Dict) -> typing.Dict:
-    """核心移动逻辑 - 完全增强版"""
+    """Core movement logic - fully enhanced version"""
 
     my_head = game_state["you"]["body"][0]
     my_body = game_state["you"]["body"]
@@ -70,14 +61,14 @@ def move(game_state: typing.Dict) -> typing.Dict:
     possible_moves = ["up", "down", "left", "right"]
     move_scores = {move: 0 for move in possible_moves}
 
-    # 第一层: 基础安全
+    # Layer 1: Basic safety
     safe_moves_mask = _evaluate_basic_safety(
         my_head, my_body, opponents,
         board_width, board_height,
         move_scores, possible_moves
     )
 
-    # 第二层: 空间评估(使用动态深度洪水填充)
+    # Layer 2: Space evaluation (using dynamic depth flood fill)
     _evaluate_space_availability(
         my_head, my_body, my_length, opponents,
         board_width, board_height,
@@ -85,14 +76,14 @@ def move(game_state: typing.Dict) -> typing.Dict:
         game_state
     )
 
-    # ✅ 补丁5: 动态计算进攻阈值
+    # Patch 5: Dynamically calculate aggressive threshold
     dynamic_threshold = _calculate_dynamic_aggressive_threshold(game_state)
 
     is_aggressive = my_length >= dynamic_threshold and my_health > LOW_HEALTH_THRESHOLD
     is_critical = my_health < CRITICAL_HEALTH_THRESHOLD
     need_food = my_health < LOW_HEALTH_THRESHOLD
 
-    # 紧急模式(增强版,考虑第三方威胁)
+    # Emergency mode (enhanced version, considers third-party threats)
     if is_critical and opponents:
         _evaluate_emergency_strategy_enhanced(
             my_head, my_body, my_length, my_health,
@@ -101,7 +92,7 @@ def move(game_state: typing.Dict) -> typing.Dict:
             game_state
         )
 
-    # 正常觅食(智能食物选择)
+    # Normal food seeking (smart food selection)
     elif food and (need_food or not is_aggressive):
         _evaluate_food_seeking_smart(
             my_head, food, move_scores,
@@ -110,14 +101,14 @@ def move(game_state: typing.Dict) -> typing.Dict:
             game_state
         )
 
-    # 进攻策略
+    # Aggressive strategy
     if is_aggressive and opponents:
         _evaluate_aggressive_strategy(
             my_head, my_length, opponents,
             move_scores, possible_moves, safe_moves_mask
         )
 
-    # 头对头防御(2步预测)
+    # Head-to-head defense (2-step prediction)
     if opponents:
         _evaluate_head_to_head_defense_enhanced(
             my_head, my_length, opponents,
@@ -125,13 +116,13 @@ def move(game_state: typing.Dict) -> typing.Dict:
             move_scores, possible_moves, safe_moves_mask
         )
 
-    # 位置偏好
+    # Position preference
     _evaluate_position_preference(
         my_head, board_width, board_height,
         move_scores, possible_moves, safe_moves_mask
     )
 
-    # 选择最佳移动
+    # Select best move
     safe_moves = [m for m in possible_moves if safe_moves_mask[m] and move_scores[m] > -9000]
 
     if not safe_moves:
@@ -146,49 +137,49 @@ def move(game_state: typing.Dict) -> typing.Dict:
 
 
 # ============================================================================
-# 补丁5: 动态进攻阈值计算
+# Patch 5: Dynamic Aggressive Threshold Calculation
 # ============================================================================
 
 def _calculate_dynamic_aggressive_threshold(game_state: typing.Dict) -> int:
     """
-    根据当前局势动态计算进攻阈值
+    Dynamically calculate aggressive threshold based on current game state
 
-    补丁5 - 解决固定阈值容易被预测的问题
+    Patch 5 - Solves the problem of fixed thresholds being easily predictable
     """
     my_length = len(game_state['you']['body'])
     opponents = [s for s in game_state['board']['snakes']
                  if s['id'] != game_state['you']['id']]
 
     if not opponents:
-        return 6  # 无对手,可以激进
+        return 6  # No opponents, can be aggressive
 
-    # 计算对手平均长度
+    # Calculate average opponent length
     avg_opponent_length = sum(len(s['body']) for s in opponents) / len(opponents)
 
-    # 计算最强对手长度
+    # Calculate strongest opponent length
     max_opponent_length = max(len(s['body']) for s in opponents)
 
-    # 策略1: 如果对手普遍比我强很多,保守
+    # Strategy 1: If opponents are generally much stronger, be conservative
     if avg_opponent_length > my_length + 3:
         return 10
 
-    # 策略2: 如果最强对手比我强很多,保守
+    # Strategy 2: If strongest opponent is much stronger, be conservative
     if max_opponent_length > my_length + 4:
         return 11
 
-    # 策略3: 如果对手普遍比我弱,激进
+    # Strategy 3: If opponents are generally weaker, be aggressive
     if avg_opponent_length < my_length - 2:
         return 6
 
-    # 策略4: 对手数量多,保守
+    # Strategy 4: Many opponents, be conservative
     if len(opponents) >= 4:
         return 9
 
-    # 策略5: 对手数量少,可以适当激进
+    # Strategy 5: Few opponents, can be somewhat aggressive
     if len(opponents) <= 2:
         return 7
 
-    # 默认
+    # Default
     return 8
 
 
@@ -199,7 +190,7 @@ def _calculate_dynamic_aggressive_threshold(game_state: typing.Dict) -> int:
 def _evaluate_basic_safety(
         my_head, my_body, opponents, board_width, board_height, move_scores, possible_moves
 ):
-    """第一层: 基础安全"""
+    """Layer 1: Basic safety"""
     safe_mask = {move: True for move in possible_moves}
     my_neck = my_body[1] if len(my_body) > 1 else None
 
@@ -234,8 +225,8 @@ def _evaluate_space_availability(
         move_scores, possible_moves, safe_mask, game_state
 ):
     """
-    第二层: 空间评估
-    补丁1 - 使用动态深度洪水填充
+    Layer 2: Space evaluation
+    Patch 1 - Use dynamic depth flood fill
     """
     for move in possible_moves:
         if not safe_mask[move]:
@@ -259,13 +250,13 @@ def _evaluate_emergency_strategy_enhanced(
         board_width, board_height, move_scores, possible_moves, safe_mask, game_state
 ):
     """
-    紧急策略(增强版)
-    补丁2 - 考虑第三方威胁和路径安全
+    Emergency strategy (enhanced version)
+    Patch 2 - Consider third-party threats and path safety
     """
     best_food_option = None
     best_hunt_option = None
 
-    # 评估食物选项
+    # Evaluate food options
     if food:
         closest_food = min(food, key=lambda f: _manhattan_distance(my_head, f))
         food_distance = _manhattan_distance(my_head, closest_food)
@@ -277,7 +268,7 @@ def _evaluate_emergency_strategy_enhanced(
                 'score': 500 / (food_distance + 1)
             }
 
-    # 评估猎杀选项(增强版)
+    # Evaluate hunt options (enhanced version)
     for opponent in opponents:
         opponent_length = len(opponent['body'])
         opponent_head = opponent['body'][0]
@@ -292,7 +283,7 @@ def _evaluate_emergency_strategy_enhanced(
 
         potential_food_gain = opponent_length
 
-        # ✅ 新增: 检查第三方威胁
+        # New: Check third-party threats
         third_party_threat = 0
         for other_opponent in opponents:
             if other_opponent['id'] == opponent['id']:
@@ -307,7 +298,7 @@ def _evaluate_emergency_strategy_enhanced(
                 if distance_to_other <= 5:
                     third_party_threat += 200 / (distance_to_other + 1)
 
-        # ✅ 新增: 评估追杀路径安全性
+        # New: Evaluate chase path safety
         temp_game_state = game_state.copy()
         temp_game_state['you'] = {
             'id': game_state['you']['id'],
@@ -317,7 +308,7 @@ def _evaluate_emergency_strategy_enhanced(
         chase_space = _flood_fill_dynamic(opponent_head, temp_game_state)
         chase_path_safe = chase_space >= my_length
 
-        # 综合评分(包含新的风险因素)
+        # Comprehensive score (includes new risk factors)
         hunt_score = (
                 potential_food_gain * 50
                 - distance_to_opponent * 10
@@ -326,7 +317,7 @@ def _evaluate_emergency_strategy_enhanced(
                 - 100
         )
 
-        # 提高收益阈值(更保守)
+        # Increase reward threshold (more conservative)
         if hunt_score > 50 and potential_food_gain >= HUNT_REWARD_THRESHOLD:
             if best_hunt_option is None or hunt_score > best_hunt_option['score']:
                 best_hunt_option = {
@@ -337,9 +328,9 @@ def _evaluate_emergency_strategy_enhanced(
                     'path_safe': chase_path_safe
                 }
 
-    # 决策(更严格的条件)
+    # Decision (stricter conditions)
     if best_hunt_option and best_food_option:
-        # 猎杀必须显著优于觅食,且路径安全
+        # Hunt must be significantly better than food seeking, and path must be safe
         if (best_hunt_option['score'] > best_food_option['score'] * 2.0 and
                 best_hunt_option['path_safe'] and
                 best_hunt_option['third_party_risk'] < 100):
@@ -361,7 +352,7 @@ def _evaluate_emergency_strategy_enhanced(
 
 
 def _apply_hunting_strategy(my_head, hunt_option, move_scores, possible_moves, safe_mask):
-    """应用猎杀策略"""
+    """Apply hunting strategy"""
     target = hunt_option['target']
 
     for move in possible_moves:
@@ -374,7 +365,7 @@ def _apply_hunting_strategy(my_head, hunt_option, move_scores, possible_moves, s
 
 
 def _apply_food_seeking(my_head, target_food, move_scores, possible_moves, safe_mask, weight):
-    """应用觅食策略"""
+    """Apply food seeking strategy"""
     for move in possible_moves:
         if not safe_mask[move]:
             continue
@@ -389,8 +380,8 @@ def _evaluate_food_seeking_smart(
         is_critical, need_food, game_state
 ):
     """
-    智能食物选择(补丁4)
-    综合考虑距离、空间、威胁
+    Smart food selection (Patch 4)
+    Comprehensively considers distance, space, and threats
     """
     my_length = len(game_state['you']['body'])
     opponents = [s for s in game_state['board']['snakes'] if s['id'] != game_state['you']['id']]
@@ -429,7 +420,7 @@ def _evaluate_food_seeking_smart(
 
 
 def _evaluate_aggressive_strategy(my_head, my_length, opponents, move_scores, possible_moves, safe_mask):
-    """进攻策略"""
+    """Aggressive strategy"""
     for opponent in opponents:
         opponent_head = opponent['body'][0]
         opponent_length = len(opponent['body'])
@@ -460,15 +451,15 @@ def _evaluate_head_to_head_defense_enhanced(
         move_scores, possible_moves, safe_mask
 ):
     """
-    头对头防御(增强版)
-    补丁3 - 使用2步预测
+    Head-to-head defense (enhanced version)
+    Patch 3 - Use 2-step prediction
     """
     for opponent in opponents:
         opponent_head = opponent['body'][0]
         opponent_length = len(opponent['body'])
 
         if opponent_length >= my_length:
-            # 使用2步预测
+            # Use 2-step prediction
             predicted_positions = _predict_opponent_next_moves(
                 opponent, board_width, board_height, depth=2
             )
@@ -493,7 +484,7 @@ def _evaluate_head_to_head_defense_enhanced(
 
 
 def _evaluate_position_preference(my_head, board_width, board_height, move_scores, possible_moves, safe_mask):
-    """位置偏好"""
+    """Position preference"""
     center_x = board_width / 2
     center_y = board_height / 2
 
@@ -557,13 +548,13 @@ def _get_possible_next_positions(position, width, height):
 
 
 # ============================================================================
-# 补丁1: 动态洪水填充
+# Patch 1: Dynamic Flood Fill
 # ============================================================================
 
 def _flood_fill_dynamic(start_pos, game_state):
     """
-    洪水填充算法(动态深度版)
-    补丁1 - 根据地图大小动态调整搜索深度
+    Flood fill algorithm (dynamic depth version)
+    Patch 1 - Dynamically adjust search depth based on map size
     """
     board_width = game_state['board']['width']
     board_height = game_state['board']['height']
@@ -580,17 +571,17 @@ def _flood_fill_dynamic(start_pos, game_state):
             for segment in snake['body'][:-1]:
                 obstacles.add((segment['x'], segment['y']))
 
-    # 动态计算最大迭代次数
+    # Dynamically calculate maximum iterations
     board_size = board_width * board_height
 
-    if board_size <= 100:  # 小地图 (7x7, 10x10)
+    if board_size <= 100:  # Small map (7x7, 10x10)
         base_max = 80
-    elif board_size <= 200:  # 中地图 (11x11, 13x13)
+    elif board_size <= 200:  # Medium map (11x11, 13x13)
         base_max = 120
-    else:  # 大地图 (19x19, 25x25)
+    else:  # Large map (19x19, 25x25)
         base_max = min(board_size // 2, 250)
 
-    # 提前终止条件
+    # Early termination condition
     safe_space = my_length * 3
 
     visited = set()
@@ -603,7 +594,7 @@ def _flood_fill_dynamic(start_pos, game_state):
         current = queue.popleft()
         count += 1
 
-        # 提前终止优化
+        # Early termination optimization
         if count >= safe_space:
             break
 
@@ -621,11 +612,11 @@ def _flood_fill_dynamic(start_pos, game_state):
 
 
 # ============================================================================
-# 补丁4: 智能食物选择辅助函数
+# Patch 4: Smart Food Selection Helper Functions
 # ============================================================================
 
 def _estimate_space_after_reaching(food_pos, game_state):
-    """估算到达食物位置后的空间"""
+    """Estimate space after reaching food position"""
     temp_state = {
         'board': game_state['board'],
         'you': {
@@ -638,7 +629,7 @@ def _estimate_space_after_reaching(food_pos, game_state):
 
 
 def _count_threats_near(food_pos, opponents, my_length, my_head):
-    """计算食物点附近的威胁"""
+    """Count threats near food position"""
     threat_count = 0.0
     my_distance = _manhattan_distance(my_head, food_pos)
 
@@ -654,11 +645,11 @@ def _count_threats_near(food_pos, opponents, my_length, my_head):
 
 
 # ============================================================================
-# 补丁3: 多步预测
+# Patch 3: Multi-step Prediction
 # ============================================================================
 
 def _predict_opponent_next_moves(opponent, board_width, board_height, depth=2):
-    """预测对手未来2步位置"""
+    """Predict opponent's next 2 positions"""
     opponent_head = opponent['body'][0]
     opponent_body = opponent['body']
     predicted_positions = []

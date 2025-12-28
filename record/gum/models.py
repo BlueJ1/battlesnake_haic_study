@@ -141,7 +141,7 @@ class Proposition(Base):
     )
 
     def __repr__(self) -> str:
-        preview = (self.text[:27] + "…") if len(self.text) > 30 else self.text
+        preview = (self.text[:27] + "...") if len(self.text) > 30 else self.text
         return f"<Proposition(id={self.id}, text={preview})>"
 
 

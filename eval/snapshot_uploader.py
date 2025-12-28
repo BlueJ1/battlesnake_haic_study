@@ -108,7 +108,7 @@ class SnapshotUploader:
                 )
                 response.raise_for_status()
 
-            print("✓ Code uploaded")
+            print("[OK] Code uploaded")
 
             # Upload metadata
             print("Uploading metadata...")
@@ -118,13 +118,13 @@ class SnapshotUploader:
                 )
                 response.raise_for_status()
 
-            print("✓ Metadata uploaded")
+            print("[OK] Metadata uploaded")
 
             return {"status": "success"}
 
         except requests.exceptions.HTTPError as e:
             error_msg = str(e)
-            print(f"\n✗ Upload failed: {error_msg}", file=sys.stderr)
+            print(f"\n[X] Upload failed: {error_msg}", file=sys.stderr)
 
             # Check for common error patterns
             status_code = e.response.status_code if e.response else None
@@ -142,15 +142,15 @@ class SnapshotUploader:
             return {"status": "failed", "error": error_msg}
 
         except requests.exceptions.Timeout:
-            print("\n✗ Upload timed out - please check your internet connection", file=sys.stderr)
+            print("\n[X] Upload timed out - please check your internet connection", file=sys.stderr)
             return {"status": "failed", "error": "Request timed out"}
 
         except requests.exceptions.ConnectionError:
-            print("\n✗ Connection error - please check your internet connection", file=sys.stderr)
+            print("\n[X] Connection error - please check your internet connection", file=sys.stderr)
             return {"status": "failed", "error": "Connection failed"}
 
         except Exception as e:
-            print(f"\n✗ Upload failed: {e}", file=sys.stderr)
+            print(f"\n[X] Upload failed: {e}", file=sys.stderr)
             return {"status": "failed", "error": str(e)}
 
     def _calculate_hash(self, directory):

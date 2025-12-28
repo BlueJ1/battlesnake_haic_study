@@ -85,7 +85,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>🐍 Battlesnake Game Viewer</h1>
+        <h1>Battlesnake Game Viewer</h1>
         
         <!-- Main view: Tournaments -->
         <div id="tournaments-view">
@@ -95,7 +95,7 @@
         
         <!-- Matchups view -->
         <div id="matchups-view" class="hidden">
-            <button class="back-btn" onclick="goBackToTournaments()">← Back to Tournaments</button>
+            <button class="back-btn" onclick="goBackToTournaments()"><- Back to Tournaments</button>
             <h2 id="tournament-title">Tournament Matchups</h2>
             <div id="trueskill-summary"></div>
             <div id="matchup-list" class="loading">Loading matchups...</div>
@@ -103,7 +103,7 @@
         
         <!-- Games view -->
         <div id="games-view" class="hidden">
-            <button class="back-btn" onclick="goBackToMatchups()">← Back to Matchups</button>
+            <button class="back-btn" onclick="goBackToMatchups()"><- Back to Matchups</button>
             <h2 id="games-title">Games</h2>
             <div id="game-list" class="loading">Loading games...</div>
         </div>
@@ -133,7 +133,7 @@
                             let trueskillHtml = '';
                             if (tournament.trueskill && tournament.trueskill.rankings) {
                                 const top3 = tournament.trueskill.rankings.slice(0, 3);
-                                trueskillHtml = '<div class="trueskill-ranking"><strong>🏆 Rankings:</strong><ol>' + 
+                                trueskillHtml = '<div class="trueskill-ranking"><strong>Rankings:</strong><ol>' + 
                                     top3.map(r => `<li>${r.name} (skill: ${r.conservative_skill.toFixed(1)})</li>`).join('') +
                                     '</ol></div>';
                             }
@@ -165,9 +165,9 @@
             // Show full TrueSkill rankings if available
             const trueskillDiv = document.getElementById('trueskill-summary');
             if (trueskillData && trueskillData.rankings) {
-                let html = '<div class="trueskill-ranking"><strong>🏆 Final TrueSkill Rankings:</strong><ol>';
+                let html = '<div class="trueskill-ranking"><strong>Final TrueSkill Rankings:</strong><ol>';
                 trueskillData.rankings.forEach(r => {
-                    html += `<li><strong>${r.name}</strong> - μ: ${r.mu.toFixed(2)}, σ: ${r.sigma.toFixed(2)}, skill: ${r.conservative_skill.toFixed(2)}</li>`;
+                    html += `<li><strong>${r.name}</strong> - mu: ${r.mu.toFixed(2)}, sigma: ${r.sigma.toFixed(2)}, skill: ${r.conservative_skill.toFixed(2)}</li>`;
                 });
                 html += '</ol></div>';
                 trueskillDiv.innerHTML = html;

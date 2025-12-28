@@ -94,9 +94,9 @@ echo "Verifying snake servers..."
 FAILED=0
 echo "$SNAKE_LIST" | while IFS=':' read -r name port; do
     if curl -s http://localhost:$port/ > /dev/null; then
-        echo "✓ $name (port $port) is responding"
+        echo "[OK] $name (port $port) is responding"
     else
-        echo "✗ WARNING: $name (port $port) is not responding!"
+        echo "[X] WARNING: $name (port $port) is not responding!"
         FAILED=1
     fi
 done
@@ -139,7 +139,7 @@ TOURNAMENT_EXIT_CODE=$?
 # Check if tournament completed successfully
 if [ $TOURNAMENT_EXIT_CODE -ne 0 ]; then
     echo ""
-    echo "✗ Tournament failed with exit code: $TOURNAMENT_EXIT_CODE"
+    echo "[X] Tournament failed with exit code: $TOURNAMENT_EXIT_CODE"
     echo "Skipping snapshot upload."
     docker-compose -f docker-compose.test.yml down
     exit $TOURNAMENT_EXIT_CODE
@@ -179,7 +179,7 @@ else
             echo "Set 'enabled: true' in $SNAPSHOT_CONFIG to enable"
         elif [ "$VALIDATION_STATUS" = "VALID" ]; then
             # Configuration is valid
-            echo "✓ Configuration validated"
+            echo "[OK] Configuration validated"
             echo "  User ID: $USER_ID"
             echo ""
 
@@ -193,18 +193,18 @@ else
             # Execute upload
             if $UPLOAD_CMD; then
                 echo ""
-                echo "✓ Snapshot uploaded successfully"
+                echo "[OK] Snapshot uploaded successfully"
             else
                 echo ""
-                echo "✗ Upload failed (continuing anyway...)"
+                echo "[X] Upload failed (continuing anyway...)"
             fi
         else
-            echo "✗ Unexpected validation status: $VALIDATION_STATUS"
+            echo "[X] Unexpected validation status: $VALIDATION_STATUS"
             echo "Skipping snapshot upload..."
         fi
     else
         # Validation failed with error
-        echo "✗ Configuration validation failed:"
+        echo "[X] Configuration validation failed:"
         echo "$VALIDATION_OUTPUT"
         echo ""
         echo "Please fix $SNAPSHOT_CONFIG"

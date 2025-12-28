@@ -46,7 +46,7 @@ class RelationItem(BaseModel):
     source: int = Field(description="Proposition ID")
     label: RelationLabel = Field(description="Relationship label")
 
-    # give target a default_factory so the JSON‐schema default is [] (allowed)
+    # give target a default_factory so the JSON-schema default is [] (allowed)
     target: List[int] = Field(
         default_factory=list, description="IDs of other propositions (empty if none)"
     )

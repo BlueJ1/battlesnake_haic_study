@@ -119,7 +119,7 @@ cp eval/snapshot_config.json.template eval/snapshot_config.json
 ```
 and then copy & paste the content of json config from us.
 
-> ⚠️ **IMPORTANT: Your config URLs expire in 7 days from when they were generated.** Please complete both stages of the study (init and final submissions) within this timeframe. If your URLs expire before you finish, contact the study coordinators to request new credentials.
+> [!] **IMPORTANT: Your config URLs expire in 7 days from when they were generated.** Please complete both stages of the study (init and final submissions) within this timeframe. If your URLs expire before you finish, contact the study coordinators to request new credentials.
 
 ## Instructions on Setting Up the Screen Recording tool
 
@@ -208,7 +208,7 @@ gum
 - Press `Ctrl+C` in the terminal where `gum` is running
 - Review your recordings before submitting: `python review_recording.py`
 
-> 💡 **Tip:** If you need to take a break longer than 45 minutes, stop the recording with `Ctrl+C` and start a new session when you return.
+> **Tip:** If you need to take a break longer than 45 minutes, stop the recording with `Ctrl+C` and start a new session when you return.
 
 **If you were able to do them, great job and give yourself a round of applause! Now we are all set up and ready to develop some snake bots! Don't forget to start gum for the recording!**
 
@@ -284,7 +284,7 @@ go build -o battlesnake ./cli/battlesnake/main.go
 #### Recording Tool Issues
 
 **macOS - "Screen recording permission denied":**
-1. Go to System Preferences → Privacy & Security → Screen Recording
+1. Go to System Preferences -> Privacy & Security -> Screen Recording
 2. Add Terminal (or your IDE) to the allowed apps
 3. Restart Terminal/IDE
 

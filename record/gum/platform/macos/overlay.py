@@ -311,7 +311,7 @@ class SelectionView(AppKit.NSView):
         done_text.drawAtPoint_withAttributes_(AppKit.NSMakePoint(done_x, done_y), done_attrs)
 
         # Draw instruction text
-        text_str = "Click windows to toggle selection  •  Click again to deselect"
+        text_str = "Click windows to toggle selection  *  Click again to deselect"
         text = AppKit.NSString.stringWithString_(text_str)
         attrs = {
             AppKit.NSFontAttributeName: AppKit.NSFont.systemFontOfSize_(14),

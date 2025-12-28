@@ -28,7 +28,8 @@ Thumbs.db
 tournaments/*
 slurm-*
 README_merge.md
-run_dev_tournament.sh.internal
+run_dev_tournament.sh
+*.log
 
 # Recording data
 record/data/*

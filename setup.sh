@@ -35,9 +35,9 @@ init_conda() {
 }
 
 echo -e "${BLUE}"
-echo "╔══════════════════════════════════════════════════════════════════╗"
-echo "║     Stanford Human-AI Collaboration Study - Setup Script        ║"
-echo "╚══════════════════════════════════════════════════════════════════╝"
+echo "=============================================================================="
+echo "     Stanford Human-AI Collaboration Study - Setup Script        "
+echo "=============================================================================="
 echo -e "${NC}"
 
 # Detect OS
@@ -66,24 +66,24 @@ check_prerequisites() {
     # Check conda
     if ! command_exists conda; then
         MISSING="$MISSING conda"
-        echo -e "${RED}✗ conda not found${NC}"
+        echo -e "${RED}[X] conda not found${NC}"
         echo "  Please install Miniconda or Anaconda from:"
         echo "  https://docs.conda.io/en/latest/miniconda.html"
     else
-        echo -e "${GREEN}✓ conda found${NC}"
+        echo -e "${GREEN}[OK] conda found${NC}"
     fi
 
     # Check Docker
     if ! command_exists docker; then
         MISSING="$MISSING docker"
-        echo -e "${RED}✗ docker not found${NC}"
+        echo -e "${RED}[X] docker not found${NC}"
         echo "  Please install Docker Desktop from:"
         echo "  https://docs.docker.com/desktop/"
     else
-        echo -e "${GREEN}✓ docker found${NC}"
+        echo -e "${GREEN}[OK] docker found${NC}"
         # Check if Docker daemon is running
         if ! docker info >/dev/null 2>&1; then
-            echo -e "${YELLOW}⚠ Docker daemon is not running${NC}"
+            echo -e "${YELLOW}[!] Docker daemon is not running${NC}"
             case "$OS" in
                 macos|windows)
                     echo "  Please open Docker Desktop and keep it running."
@@ -100,23 +100,23 @@ check_prerequisites() {
                 exit 1
             fi
         else
-            echo -e "${GREEN}✓ Docker daemon running${NC}"
+            echo -e "${GREEN}[OK] Docker daemon running${NC}"
         fi
     fi
 
     # Check Git
     if ! command_exists git; then
         MISSING="$MISSING git"
-        echo -e "${RED}✗ git not found${NC}"
+        echo -e "${RED}[X] git not found${NC}"
     else
-        echo -e "${GREEN}✓ git found${NC}"
+        echo -e "${GREEN}[OK] git found${NC}"
     fi
 
     # Check Go (will be installed via conda if not found)
     if ! command_exists go; then
-        echo -e "${YELLOW}⚠ go not found - will be installed via conda${NC}"
+        echo -e "${YELLOW}[!] go not found - will be installed via conda${NC}"
     else
-        echo -e "${GREEN}✓ go found ($(go version | cut -d' ' -f3))${NC}"
+        echo -e "${GREEN}[OK] go found ($(go version | cut -d' ' -f3))${NC}"
     fi
 
     if [ -n "$MISSING" ]; then
@@ -130,7 +130,7 @@ check_prerequisites() {
 init_submodules() {
     echo -e "\n${BLUE}[2/6] Initializing git submodules...${NC}"
     git submodule update --init --recursive
-    echo -e "${GREEN}✓ Submodules initialized${NC}"
+    echo -e "${GREEN}[OK] Submodules initialized${NC}"
 }
 
 # Step 3: Create conda environment
@@ -151,7 +151,7 @@ setup_conda_env() {
         conda create -n snake python=3.10 -y
     fi
 
-    echo -e "${GREEN}✓ Conda environment ready${NC}"
+    echo -e "${GREEN}[OK] Conda environment ready${NC}"
 
     # Activate environment
     conda activate snake
@@ -160,7 +160,7 @@ setup_conda_env() {
     echo -e "\n${BLUE}Installing Python dependencies...${NC}"
     pip install -r requirements.txt
 
-    echo -e "${GREEN}✓ Python dependencies installed${NC}"
+    echo -e "${GREEN}[OK] Python dependencies installed${NC}"
 }
 
 # Step 4: Install Go and build battlesnake CLI
@@ -181,9 +181,9 @@ setup_battlesnake() {
 
     # Verify
     if [ -f "rules/battlesnake" ]; then
-        echo -e "${GREEN}✓ BattleSnake CLI built successfully${NC}"
+        echo -e "${GREEN}[OK] BattleSnake CLI built successfully${NC}"
     else
-        echo -e "${RED}✗ Failed to build BattleSnake CLI${NC}"
+        echo -e "${RED}[X] Failed to build BattleSnake CLI${NC}"
         exit 1
     fi
 }
@@ -201,7 +201,7 @@ setup_recording_tool() {
         macos)
             pip install -e .
             echo -e "${YELLOW}Note: Please enable Screen Recording permission for Terminal/VSCode${NC}"
-            echo "  Go to: System Preferences → Privacy & Security → Screen Recording"
+            echo "  Go to: System Preferences -> Privacy & Security -> Screen Recording"
             ;;
         linux)
             # Check for required system packages
@@ -243,7 +243,7 @@ setup_recording_tool() {
     esac
 
     cd ..
-    echo -e "${GREEN}✓ Recording tool installed${NC}"
+    echo -e "${GREEN}[OK] Recording tool installed${NC}"
 }
 
 # Step 6: Setup tournament script
@@ -253,7 +253,7 @@ setup_tournament() {
     if [ ! -f "run_dev_tournament.sh" ]; then
         cp run_dev_tournament_local.sh run_dev_tournament.sh
         chmod +x run_dev_tournament.sh
-        echo -e "${GREEN}✓ Tournament script configured${NC}"
+        echo -e "${GREEN}[OK] Tournament script configured${NC}"
     else
         echo -e "${YELLOW}Tournament script already exists${NC}"
     fi
@@ -267,7 +267,7 @@ setup_snapshot_config() {
     CONFIG_FILE="eval/snapshot_config.json"
 
     if [ -f "$CONFIG_FILE" ]; then
-        echo -e "${GREEN}✓ Snapshot config already exists${NC}"
+        echo -e "${GREEN}[OK] Snapshot config already exists${NC}"
 
         # Validate existing config
         if python3 -c "import json; json.load(open('$CONFIG_FILE'))" 2>/dev/null; then
@@ -284,9 +284,9 @@ setup_snapshot_config() {
         fi
     fi
 
-    echo -e "\n${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "\n${BLUE}============================================================================${NC}"
     echo -e "${BLUE}                    SNAPSHOT CONFIG SETUP${NC}"
-    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${BLUE}============================================================================${NC}"
     echo ""
     echo "You should have received your personal config JSON via email."
     echo "Please paste the ENTIRE JSON content below."
@@ -296,7 +296,7 @@ setup_snapshot_config() {
     echo "  2. Paste it here (it may be multiple lines)"
     echo "  3. Press Enter, then Ctrl+D (Mac/Linux) or Ctrl+Z (Windows) to finish"
     echo ""
-    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${BLUE}============================================================================${NC}"
     echo -e "Paste your config JSON now:"
     echo ""
 
@@ -330,13 +330,13 @@ setup_snapshot_config() {
             USER_ID=$(python3 -c "import json; print(json.load(open('$CONFIG_FILE')).get('user_id', 'NOT SET'))")
             ENABLED=$(python3 -c "import json; print(json.load(open('$CONFIG_FILE')).get('enabled', False))")
 
-            echo -e "\n${GREEN}✓ Config saved successfully!${NC}"
+            echo -e "\n${GREEN}[OK] Config saved successfully!${NC}"
             echo -e "  File: ${BLUE}$CONFIG_FILE${NC}"
             echo -e "  User ID: ${BLUE}$USER_ID${NC}"
             echo -e "  Enabled: ${BLUE}$ENABLED${NC}"
 
             if [ "$ENABLED" != "True" ] && [ "$ENABLED" != "true" ]; then
-                echo -e "\n${YELLOW}⚠ Warning: 'enabled' is not set to true in your config.${NC}"
+                echo -e "\n${YELLOW}[!] Warning: 'enabled' is not set to true in your config.${NC}"
                 echo "  Submissions may not work until this is enabled."
             fi
 
@@ -363,9 +363,9 @@ setup_snapshot_config() {
 # Final summary
 print_summary() {
     echo -e "\n${GREEN}"
-    echo "╔══════════════════════════════════════════════════════════════════╗"
-    echo "║                    Setup Complete!                               ║"
-    echo "╚══════════════════════════════════════════════════════════════════╝"
+    echo "=============================================================================="
+    echo "                    Setup Complete!                               "
+    echo "=============================================================================="
     echo -e "${NC}"
 
     echo "Next steps:"

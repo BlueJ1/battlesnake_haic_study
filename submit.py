@@ -128,21 +128,21 @@ def upload_recordings(data_path, config, auto_delete=False):
     uploader = GCSUploader(config.get("config_path", "eval/snapshot_config.json"))
 
     if not uploader.enabled:
-        print("\n⚠️  Recording upload skipped (not enabled in config)")
+        print("\n[!] Recording upload skipped (not enabled in config)")
         return {"status": "disabled"}
 
     print(f"\n{'='*70}")
-    print("📤 UPLOADING RECORDINGS")
+    print("UPLOADING RECORDINGS")
     print(f"{'='*70}")
 
     result = uploader.upload_recording(str(data_path))
 
     if result["status"] == "success":
-        print(f"✅ Recordings uploaded to slot {result.get('slot', 'N/A')}")
+        print(f"[OK] Recordings uploaded to slot {result.get('slot', 'N/A')}")
 
         # Auto-delete if requested
         if auto_delete:
-            print("\n🗑️  Cleaning up local recording data...")
+            print("\nCleaning up local recording data...")
             import shutil
 
             screenshots_dir = data_path / "screenshots"
@@ -155,16 +155,16 @@ def upload_recordings(data_path, config, auto_delete=False):
                 wal_file.unlink()
             if conversations_file.exists():
                 conversations_file.unlink()
-            print("✓ Local recording data deleted")
+            print("[OK] Local recording data deleted")
         else:
-            print(f"\n💾 Local data preserved in: {data_path}")
+            print(f"\nLocal data preserved in: {data_path}")
 
         print(f"{'='*70}")
         return result
 
     elif result["status"] == "error":
         error_msg = result.get("error", "")
-        print(f"\n✗ Recording upload failed: {error_msg}")
+        print(f"\n[X] Recording upload failed: {error_msg}")
 
         # Check for common error patterns and provide helpful guidance
         if "403" in error_msg or "Forbidden" in error_msg or "AccessDenied" in error_msg:
@@ -189,7 +189,7 @@ def upload_recordings(data_path, config, auto_delete=False):
         print(f"{'='*70}")
         return result
     else:
-        print(f"⚠️  Unexpected status: {result.get('status')}")
+        print(f"[!] Unexpected status: {result.get('status')}")
         return result
 
 
@@ -218,23 +218,23 @@ def submit_snake(args, config):
 
     # Show combined submission info
     print(f"\n{'='*70}")
-    print("🚀 SUBMISSION")
+    print("SUBMISSION")
     print(f"{'='*70}")
     print(f"User:   {config['user_id']}")
     print(f"Stage:  {args.stage}")
-    print("\n📦 Snake Code:")
+    print("\nSnake Code:")
     print(f"  Name:   {args.snake_name}")
     print(f"  Source: {args.source}")
 
     if has_recordings:
-        print("\n📹 Recording Data:")
+        print("\nRecording Data:")
         print(f"  Screenshots:      {recording_summary['num_screenshots']} files")
         print(f"  Database:         {recording_summary['db_size_mb']:.1f} MB")
         if recording_summary["has_conversations"]:
             print(f"  AI Conversations: {recording_summary['num_conversations']} entries")
         print(f"  Total size:       {recording_summary['total_size_mb']:.1f} MB")
     else:
-        print(f"\n⚠️  No recording data found in {args.data_dir}")
+        print(f"\n[!] No recording data found in {args.data_dir}")
         print("  (Recording upload will be skipped)")
 
     print(f"{'='*70}\n")
@@ -252,7 +252,7 @@ def submit_snake(args, config):
 
     # Step 1: Upload snake code
     print(f"{'='*70}")
-    print("🐍 UPLOADING SNAKE CODE")
+    print("UPLOADING SNAKE CODE")
     print(f"{'='*70}")
 
     uploader = SnapshotUploader(config)
@@ -266,11 +266,11 @@ def submit_snake(args, config):
     metadata.unlink()
 
     if result["status"] != "success":
-        print(f"✗ Snake code upload failed: {result.get('error')}")
+        print(f"[X] Snake code upload failed: {result.get('error')}")
         print(f"{'='*70}")
         return 1
 
-    print("✅ Snake code uploaded successfully")
+    print("[OK] Snake code uploaded successfully")
     print(f"{'='*70}")
 
     # Step 2: Upload recordings (if available)
@@ -280,16 +280,16 @@ def submit_snake(args, config):
 
     # Final summary
     print(f"\n{'='*70}")
-    print("✅ SUBMISSION COMPLETE")
+    print("[OK] SUBMISSION COMPLETE")
     print(f"{'='*70}")
-    print(f"✓ Snake code:  {args.stage} stage")
+    print(f"[OK] Snake code:  {args.stage} stage")
     if has_recordings:
         if recording_result and recording_result["status"] == "success":
-            print("✓ Recordings:  uploaded")
+            print("[OK] Recordings:  uploaded")
         else:
-            print("⚠️  Recordings:  failed or disabled")
+            print("[!] Recordings:  failed or disabled")
     else:
-        print("⊘ Recordings:  none available")
+        print("Recordings:  none available")
     print(f"{'='*70}")
 
     return 0
@@ -344,7 +344,7 @@ def submit_recordings_only(args, config):
 
     # Show summary
     print(f"\n{'='*70}")
-    print("📤 RECORDING DATA SUBMISSION")
+    print("RECORDING DATA SUBMISSION")
     print(f"{'='*70}")
     print(f"User:               {config['user_id']}")
     print(f"Data directory:     {data_path}")

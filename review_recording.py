@@ -207,7 +207,7 @@ TEMPLATE_HTML = """<!DOCTYPE html>
 <body>
     <div class="container">
         <div class="header">
-            <h1>📹 Recording Review</h1>
+            <h1>Recording Review</h1>
             <div class="stats">
                 <div class="stat">
                     <div style="font-size: 24px; font-weight: bold;" id="total-count">{{ total_screenshots }}</div>
@@ -248,17 +248,17 @@ TEMPLATE_HTML = """<!DOCTYPE html>
             </div>
 
             <div id="deleted-notice" class="deleted-notice" style="display: none;">
-                ✓ Screenshot deleted
+                [OK] Screenshot deleted
             </div>
 
             <div class="controls">
-                <button class="btn btn-secondary" id="prev-btn" onclick="navigate(-1)">← Previous</button>
-                <button class="btn btn-danger" id="delete-btn" onclick="deleteScreenshot()">🗑️ Delete</button>
-                <button class="btn btn-secondary" id="next-btn" onclick="navigate(1)">Next →</button>
+                <button class="btn btn-secondary" id="prev-btn" onclick="navigate(-1)"><- Previous</button>
+                <button class="btn btn-danger" id="delete-btn" onclick="deleteScreenshot()">Delete</button>
+                <button class="btn btn-secondary" id="next-btn" onclick="navigate(1)">Next -></button>
             </div>
 
             <div class="controls">
-                <button class="btn btn-primary" onclick="finishReview()">✓ Finish Review</button>
+                <button class="btn btn-primary" onclick="finishReview()">[OK] Finish Review</button>
             </div>
         </div>
     </div>
@@ -415,13 +415,13 @@ def main():
         return 1
 
     print(f"\n{'='*70}")
-    print("📹 Recording Review Server")
+    print("Recording Review Server")
     print(f"{'='*70}")
     print(f"Screenshots: {len(screenshots)}")
     print(f"Data dir:    {DATA_DIR}")
     print(f"\nStarting web server on http://localhost:{args.port}")
-    print("\n💡 Instructions:")
-    print("  - Use ← → arrow keys or buttons to navigate")
+    print("\nInstructions:")
+    print("  - Use <- -> arrow keys or buttons to navigate")
     print("  - Press Delete/Backspace or click Delete button to remove")
     print("  - Review all screenshots for privacy/sensitivity")
     print("  - Close browser when done")

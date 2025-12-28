@@ -11,14 +11,14 @@ def check_and_build_rules_cli():
 
     # Check if binary exists and is executable
     if os.path.exists(cli_path) and os.access(cli_path, os.X_OK):
-        print(f"✓ Found Battlesnake CLI at {cli_path}")
+        print(f"[OK] Found Battlesnake CLI at {cli_path}")
         return True
 
     print(f"Battlesnake CLI not found at {cli_path}")
 
     # Check if we have the rules directory
     if not os.path.exists("rules"):
-        print("✗ ERROR: 'rules' directory not found")
+        print("[X] ERROR: 'rules' directory not found")
         print("  Please clone the Battlesnake rules repository:")
         print("  git clone https://github.com/BattlesnakeOfficial/rules.git")
         return False
@@ -32,7 +32,7 @@ def check_and_build_rules_cli():
     elif os.path.exists("rules/Makefile"):
         return _build_with_make()
     else:
-        print("✗ ERROR: Don't know how to build the CLI")
+        print("[X] ERROR: Don't know how to build the CLI")
         print("  Please build manually in the rules/ directory")
         return False
 
@@ -44,7 +44,7 @@ def _build_go_cli():
     # Check if Go is installed
     go_check = subprocess.run(["which", "go"], capture_output=True)
     if go_check.returncode != 0:
-        print("✗ ERROR: Go is not installed")
+        print("[X] ERROR: Go is not installed")
         print("  Install Go: https://golang.org/doc/install")
         return False
 
@@ -62,21 +62,21 @@ def _build_go_cli():
         )
 
         if result.returncode == 0:
-            print("✓ Successfully built Battlesnake CLI")
+            print("[OK] Successfully built Battlesnake CLI")
 
             # Make it executable
             os.chmod("rules/battlesnake", 0o755)
             return True
         else:
-            print("✗ Build failed:")
+            print("[X] Build failed:")
             print(result.stderr)
             return False
 
     except subprocess.TimeoutExpired:
-        print("✗ Build timed out after 2 minutes")
+        print("[X] Build timed out after 2 minutes")
         return False
     except Exception as e:
-        print(f"✗ Build error: {e}")
+        print(f"[X] Build error: {e}")
         return False
 
 
@@ -90,16 +90,16 @@ def _build_with_make():
         )
 
         if result.returncode == 0:
-            print("✓ Successfully built Battlesnake CLI")
+            print("[OK] Successfully built Battlesnake CLI")
             return True
         else:
-            print("✗ Build failed:")
+            print("[X] Build failed:")
             print(result.stderr)
             return False
 
     except FileNotFoundError:
-        print("✗ ERROR: 'make' command not found")
+        print("[X] ERROR: 'make' command not found")
         return False
     except Exception as e:
-        print(f"✗ Build error: {e}")
+        print(f"[X] Build error: {e}")
         return False

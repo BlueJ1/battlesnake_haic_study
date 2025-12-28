@@ -55,8 +55,8 @@ class LinuxActiveAppDetector(ActiveAppDetectorBase):
         # Try to get window title and extract app name
         title = get_active_window_title_wayland()
         if title:
-            # Often the app name is the last part after " - " or " — "
-            for sep in [" — ", " - ", " – "]:
+            # Often the app name is the last part after " - " or " -- "
+            for sep in [" -- ", " - ", " - "]:
                 if sep in title:
                     return title.split(sep)[-1].strip()
             return title

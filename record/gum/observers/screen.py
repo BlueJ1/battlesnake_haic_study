@@ -4,7 +4,7 @@ from __future__ import annotations
 # Imports                                                                     #
 ###############################################################################
 
-# — Standard library —
+# - Standard library -
 import gc
 import logging
 import os
@@ -15,10 +15,10 @@ from typing import Any, Dict, List, Optional
 
 import asyncio
 
-# — Third-party —
+# - Third-party -
 from PIL import Image, ImageDraw
 
-# — Local —
+# - Local -
 from .observer import Observer
 from ..schemas import Update
 from ..platform import get_window_manager, get_region_selector, get_screen_capturer
@@ -49,7 +49,7 @@ class Screen(Observer):
     _SCROLL_MAX_FREQUENCY: int = 8  # Max scroll events per second
     _SCROLL_SESSION_TIMEOUT: float = 3.0  # Timeout for scroll sessions
 
-    # ─────────────────────────────── construction
+    # -------------------------------- construction
     def __init__(
         self,
         screenshots_dir: str = "~/Downloads/records/screenshots",
@@ -271,7 +271,7 @@ class Screen(Observer):
                                     title_changed = True
                                     tracked["last_title"] = current_title
                                     logging.getLogger("Screen").info(
-                                        f"Window title changed (tab switch detected): '{last_title}' → '{current_title}'"
+                                        f"Window title changed (tab switch detected): '{last_title}' -> '{current_title}'"
                                     )
                                 elif not last_title:
                                     # First time seeing this window, store title
@@ -430,7 +430,7 @@ class Screen(Observer):
             except OSError:
                 pass  # File might already be deleted
 
-    # ─────────────────────────────── I/O helpers
+    # -------------------------------- I/O helpers
     async def _save_frame(
         self, frame, monitor_rect: dict, x, y, tag: str, box_color: str = "red", box_width: int = 10
     ) -> str:
@@ -536,7 +536,7 @@ class Screen(Observer):
         if hasattr(self, "_thread_pool"):
             self._thread_pool.shutdown(wait=True)
 
-    # ─────────────────────────────── skip guard
+    # -------------------------------- skip guard
     def _skip(self) -> bool:
         if not self._guard:
             return False
@@ -551,7 +551,7 @@ class Screen(Observer):
         except Exception:
             return False
 
-    # ─────────────────────────────── main async worker
+    # -------------------------------- main async worker
     async def _worker(self) -> None:  # overrides base class
         log = logging.getLogger("Screen")
         if self.debug:
@@ -582,14 +582,14 @@ class Screen(Observer):
                 if test_frame:
                     capture_mode = "window-specific" if test_window_id else "region-based"
                     log.info(
-                        f"✓ Screen capture test successful ({type(sct).__name__}, {capture_mode})"
+                        f"[OK] Screen capture test successful ({type(sct).__name__}, {capture_mode})"
                     )
-                    print(f"✓ Screen capture working ({type(sct).__name__}, {capture_mode})")
+                    print(f"[OK] Screen capture working ({type(sct).__name__}, {capture_mode})")
                 else:
-                    log.warning("⚠ Screen capture test returned None")
+                    log.warning("[!] Screen capture test returned None")
             except Exception as e:
                 log.error(f"Screen capture test failed: {e}")
-                print(f"⚠ Screen capture test failed: {e}")
+                print(f"[!] Screen capture test failed: {e}")
 
         try:
             # Initialize mons list - will be updated dynamically for tracked windows
@@ -691,7 +691,7 @@ class Screen(Observer):
                     return
 
                 log.info(
-                    f"{typ:<6} @({rel_x:7.1f},{rel_y:7.1f}) → win={idx}   {'(guarded)' if self._skip() else ''}"
+                    f"{typ:<6} @({rel_x:7.1f},{rel_y:7.1f}) -> win={idx}   {'(guarded)' if self._skip() else ''}"
                 )
                 if self._skip():
                     return
@@ -826,7 +826,7 @@ class Screen(Observer):
                         log.info(f"Scroll too small: magnitude={scroll_magnitude:.2f}")
                     return
 
-                log.info(f"Scroll @({rel_x:7.1f},{rel_y:7.1f}) dx={dx:.2f} dy={dy:.2f} → win={idx}")
+                log.info(f"Scroll @({rel_x:7.1f},{rel_y:7.1f}) dx={dx:.2f} dy={dy:.2f} -> win={idx}")
 
                 if self._skip():
                     return
@@ -873,13 +873,13 @@ class Screen(Observer):
             headless_input = not input_listener._available
             if headless_input:
                 log.warning(
-                    "⚠️  Input monitoring unavailable (headless mode or missing dependencies). "
+                    "[!] Input monitoring unavailable (headless mode or missing dependencies). "
                     "Screen capture will work, but mouse/keyboard events won't be captured. "
                     "Periodic captures will be enabled."
                 )
 
             # ---- main capture loop ----
-            log.info(f"Screen observer started — guarding {self._guard or '∅'}")
+            log.info(f"Screen observer started - guarding {self._guard or '(none)'}")
             last_periodic = time.time()
             frame_count = 0
 

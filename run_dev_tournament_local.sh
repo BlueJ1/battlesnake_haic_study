@@ -20,33 +20,33 @@ PREFLIGHT_FAILED=0
 
 # Check 1: Git submodules initialized
 if [ ! -f "rules/cli/battlesnake/main.go" ]; then
-    echo -e "${RED}✗ Git submodules not initialized${NC}"
+    echo -e "${RED}[X] Git submodules not initialized${NC}"
     echo "  Run: git submodule update --init --recursive"
     PREFLIGHT_FAILED=1
 else
-    echo -e "${GREEN}✓ Git submodules initialized${NC}"
+    echo -e "${GREEN}[OK] Git submodules initialized${NC}"
 fi
 
 # Check 2: Battlesnake CLI built
 if [ ! -f "rules/battlesnake" ]; then
-    echo -e "${RED}✗ Battlesnake CLI not built${NC}"
+    echo -e "${RED}[X] Battlesnake CLI not built${NC}"
     echo "  Run: cd rules && go build -o battlesnake ./cli/battlesnake/main.go"
     PREFLIGHT_FAILED=1
 else
-    echo -e "${GREEN}✓ Battlesnake CLI built${NC}"
+    echo -e "${GREEN}[OK] Battlesnake CLI built${NC}"
 fi
 
 # Check 3: Docker installed
 if ! command -v docker &> /dev/null; then
-    echo -e "${RED}✗ Docker not installed${NC}"
+    echo -e "${RED}[X] Docker not installed${NC}"
     echo "  Install from: https://docs.docker.com/desktop/"
     PREFLIGHT_FAILED=1
 else
-    echo -e "${GREEN}✓ Docker installed${NC}"
+    echo -e "${GREEN}[OK] Docker installed${NC}"
 
     # Check 4: Docker daemon running
     if ! docker info &> /dev/null; then
-        echo -e "${RED}✗ Docker daemon not running${NC}"
+        echo -e "${RED}[X] Docker daemon not running${NC}"
         case "$(uname -s)" in
             Darwin*)
                 echo "  macOS: Open Docker Desktop and keep it running"
@@ -61,26 +61,26 @@ else
         esac
         PREFLIGHT_FAILED=1
     else
-        echo -e "${GREEN}✓ Docker daemon running${NC}"
+        echo -e "${GREEN}[OK] Docker daemon running${NC}"
     fi
 fi
 
 # Check 5: Snapshot config exists (warning only)
 if [ ! -f "eval/snapshot_config.json" ]; then
-    echo -e "${YELLOW}⚠ Snapshot config not found - results won't be uploaded${NC}"
+    echo -e "${YELLOW}[!] Snapshot config not found - results won't be uploaded${NC}"
     echo "  Setup: cp eval/snapshot_config.json.template eval/snapshot_config.json"
     echo "  Then paste your config from the email"
 else
-    echo -e "${GREEN}✓ Snapshot config found${NC}"
+    echo -e "${GREEN}[OK] Snapshot config found${NC}"
 fi
 
 # Check 6: your_snake exists
 if [ ! -f "your_snake/main.py" ]; then
-    echo -e "${RED}✗ your_snake/main.py not found${NC}"
+    echo -e "${RED}[X] your_snake/main.py not found${NC}"
     echo "  Make sure your snake code is in the your_snake/ directory"
     PREFLIGHT_FAILED=1
 else
-    echo -e "${GREEN}✓ your_snake/main.py found${NC}"
+    echo -e "${GREEN}[OK] your_snake/main.py found${NC}"
 fi
 
 echo ""
@@ -199,9 +199,9 @@ echo "Verifying snake servers..."
 FAILED=0
 echo "$SNAKE_LIST" | while IFS=':' read -r name port; do
     if curl -s http://localhost:$port/ > /dev/null; then
-        echo "✓ $name (port $port) is responding"
+        echo "[OK] $name (port $port) is responding"
     else
-        echo "✗ WARNING: $name (port $port) is not responding!"
+        echo "[X] WARNING: $name (port $port) is not responding!"
         FAILED=1
     fi
 done
@@ -244,7 +244,7 @@ TOURNAMENT_EXIT_CODE=$?
 # Check if tournament completed successfully
 if [ $TOURNAMENT_EXIT_CODE -ne 0 ]; then
     echo ""
-    echo "✗ Tournament failed with exit code: $TOURNAMENT_EXIT_CODE"
+    echo "[X] Tournament failed with exit code: $TOURNAMENT_EXIT_CODE"
     echo "Skipping snapshot upload."
     docker-compose -f docker-compose.test.yml down
     exit $TOURNAMENT_EXIT_CODE
@@ -284,7 +284,7 @@ else
             echo "Set 'enabled: true' in $SNAPSHOT_CONFIG to enable"
         elif [ "$VALIDATION_STATUS" = "VALID" ]; then
             # Configuration is valid
-            echo "✓ Configuration validated"
+            echo "[OK] Configuration validated"
             echo "  User ID: $USER_ID"
             echo ""
 
@@ -298,18 +298,18 @@ else
             # Execute upload
             if $UPLOAD_CMD; then
                 echo ""
-                echo "✓ Snapshot uploaded successfully"
+                echo "[OK] Snapshot uploaded successfully"
             else
                 echo ""
-                echo "✗ Upload failed (continuing anyway...)"
+                echo "[X] Upload failed (continuing anyway...)"
             fi
         else
-            echo "✗ Unexpected validation status: $VALIDATION_STATUS"
+            echo "[X] Unexpected validation status: $VALIDATION_STATUS"
             echo "Skipping snapshot upload..."
         fi
     else
         # Validation failed with error
-        echo "✗ Configuration validation failed:"
+        echo "[X] Configuration validation failed:"
         echo "$VALIDATION_OUTPUT"
         echo ""
         echo "Please fix $SNAPSHOT_CONFIG"

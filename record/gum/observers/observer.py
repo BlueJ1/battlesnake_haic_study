@@ -14,7 +14,7 @@ class Observer(ABC):
         self._running = True
         self._task: asyncio.Task | None = asyncio.create_task(self._worker_wrapper())
 
-    # ─────────────────────────────── abstract worker
+    # -------------------------------- abstract worker
     @abstractmethod
     async def _worker(self) -> None:  # subclasses override
         pass
@@ -30,7 +30,7 @@ class Observer(ABC):
         finally:
             self._running = False
 
-    # ─────────────────────────────── public API
+    # -------------------------------- public API
     @property
     def name(self) -> str:
         return self._name

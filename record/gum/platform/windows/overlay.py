@@ -327,7 +327,7 @@ class WindowsRegionSelector(RegionSelectorBase):
                 info_text.insert(tk.END, f"Title:\n{win['full_title']}\n\n")
                 info_text.insert(
                     tk.END,
-                    f"Size:\n{win['bounds']['width']} × {win['bounds']['height']} pixels\n\n",
+                    f"Size:\n{win['bounds']['width']} x {win['bounds']['height']} pixels\n\n",
                 )
                 info_text.insert(
                     tk.END, f"Position:\n({win['bounds']['left']}, {win['bounds']['top']})\n\n"
@@ -380,9 +380,9 @@ class WindowsRegionSelector(RegionSelectorBase):
             info_text.delete(1.0, tk.END)
             info_text.insert(tk.END, "No windows detected.\n\n")
             info_text.insert(tk.END, "This might happen if:\n")
-            info_text.insert(tk.END, "• All windows are minimized\n")
-            info_text.insert(tk.END, "• Windows are too small\n")
-            info_text.insert(tk.END, "• Permission issues\n\n")
+            info_text.insert(tk.END, "* All windows are minimized\n")
+            info_text.insert(tk.END, "* Windows are too small\n")
+            info_text.insert(tk.END, "* Permission issues\n\n")
             info_text.insert(tk.END, "Try 'Record Full Screen' instead.")
             info_text.config(state=tk.DISABLED)
 
@@ -405,7 +405,7 @@ class WindowsRegionSelector(RegionSelectorBase):
         # Primary action button (highlighted)
         select_btn = tk.Button(
             button_frame,
-            text="✓ Record Selected Window",
+            text="[OK] Record Selected Window",
             command=on_select_window,
             width=22,
             font=("Arial", 10, "bold"),
@@ -448,8 +448,8 @@ class WindowsRegionSelector(RegionSelectorBase):
         instructions = tk.Label(
             instructions_frame,
             text=(
-                "• Click to select • Ctrl+Click or Shift+Click to select multiple "
-                "• Double-click or Enter to confirm • F11 for fullscreen • Esc to cancel"
+                "* Click to select * Ctrl+Click or Shift+Click to select multiple "
+                "* Double-click or Enter to confirm * F11 for fullscreen * Esc to cancel"
             ),
             font=("Arial", 9),
             fg="gray",
