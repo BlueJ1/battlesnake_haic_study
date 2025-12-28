@@ -7,9 +7,3 @@
 [submodule "rules"]
 	path = rules
 	url = https://github.com/BattlesnakeOfficial/rules.git
-[submodule "example_snakes/chickensnake"]
-	path = example_snakes/chickensnake
-	url = https://github.com/abehou/chickensnake.git
-[submodule "example_snakes/coding-badly-tron"]
-	path = example_snakes/coding-badly-tron
-	url = https://github.com/abehou/coding-badly-tron.git

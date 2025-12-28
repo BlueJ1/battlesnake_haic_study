@@ -19,16 +19,6 @@
         "name": "untimely-neglected-wearable",
         "directory": "./example_snakes/untimely-neglected-wearable",
         "port": 7125
-      },
-      {
-        "name": "chickensnake",
-        "directory": "./example_snakes/chickensnake",
-        "port": 7127
-      },
-      {
-        "name": "coding-badly-tron",
-        "directory": "./example_snakes/coding-badly-tron",
-        "port": 7128
       }
     ],
     "base_port": 7123,
