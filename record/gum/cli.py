@@ -131,6 +131,34 @@ async def _main():
     else:
         logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
+    # Validate that snapshot_config.json exists before allowing recording
+    import pathlib
+    project_root = pathlib.Path(__file__).parent.parent.parent
+    config_paths = [
+        project_root / "eval" / "snapshot_config.json",
+        project_root / "haic_starter" / "eval" / "snapshot_config.json",
+    ]
+    
+    config_path = None
+    for path in config_paths:
+        if path.exists():
+            config_path = path
+            break
+    
+    if config_path is None:
+        print("\n" + "=" * 70)
+        print("ERROR: snapshot_config.json not found")
+        print("=" * 70)
+        print("\nRecording requires a valid snapshot_config.json file.")
+        print("This file contains your GCS upload credentials.")
+        print("\nExpected locations:")
+        for path in config_paths:
+            print(f"  - {path}")
+        print("\nPlease ensure you have received and placed the config file")
+        print("in one of the expected locations before starting recording.")
+        print("=" * 70 + "\n")
+        sys.exit(1)
+
     # Auto-detect Wayland and enable terminal-only mode if not explicitly disabled
     is_wayland = os.environ.get("XDG_SESSION_TYPE", "").lower() == "wayland"
 
