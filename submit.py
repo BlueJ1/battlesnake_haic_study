@@ -71,8 +71,24 @@ def load_config(config_path="eval/snapshot_config.json"):
     return config
 
 
-def check_recordings_available(data_dir="data"):
-    """Check if recording data is available"""
+def check_recordings_available(data_dir=None, stage=None):
+    """Check if recording data is available for the given stage"""
+    if data_dir is None:
+        # Auto-detect based on stage
+        if stage == "init":
+            data_dir = "data/init"
+        elif stage == "final":
+            data_dir = "data/final"
+        else:
+            # Fallback: check both, prefer final if init was uploaded
+            init_uploaded = Path(".init_uploaded").exists()
+            if init_uploaded and Path("data/final").exists():
+                data_dir = "data/final"
+            elif Path("data/init").exists():
+                data_dir = "data/init"
+            else:
+                data_dir = "data"  # Legacy fallback
+    
     data_path = Path(data_dir).expanduser()
     if not data_path.exists():
         return False, None
@@ -210,8 +226,16 @@ def submit_snake(args, config):
         print("=" * 70 + "\n")
         return 1
 
-    # Check for recordings
-    has_recordings, data_path = check_recordings_available(args.data_dir)
+    # Determine data directory based on stage
+    if args.stage == "init":
+        stage_data_dir = "data/init"
+    elif args.stage == "final":
+        stage_data_dir = "data/final"
+    else:
+        stage_data_dir = args.data_dir  # Fallback to provided or default
+    
+    # Check for recordings in stage-specific directory
+    has_recordings, data_path = check_recordings_available(data_dir=stage_data_dir, stage=args.stage)
     recording_summary = None
     if has_recordings:
         recording_summary = get_recording_summary(data_path)
@@ -234,8 +258,10 @@ def submit_snake(args, config):
             print(f"  AI Conversations: {recording_summary['num_conversations']} entries")
         print(f"  Total size:       {recording_summary['total_size_mb']:.1f} MB")
     else:
-        print(f"\n[!] No recording data found in {args.data_dir}")
+        print(f"\n[!] No recording data found in {stage_data_dir}")
         print("  (Recording upload will be skipped)")
+        print(f"\n  Expected location: {stage_data_dir}/")
+        print(f"  Make sure you've run 'gum' to record your {args.stage} session")
 
     print(f"{'='*70}\n")
 
@@ -271,6 +297,14 @@ def submit_snake(args, config):
         return 1
 
     print("[OK] Snake code uploaded successfully")
+    
+    # After successful init upload, mark it so future recordings use data/final/
+    if args.stage == "init":
+        init_marker = Path(".init_uploaded")
+        init_marker.touch()
+        print(f"\n[OK] Init stage marked as uploaded")
+        print(f"     Next recording session will use data/final/")
+    
     print(f"{'='*70}")
 
     # Step 2: Upload recordings (if available)

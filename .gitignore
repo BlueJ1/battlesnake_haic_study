@@ -43,6 +43,7 @@ eval/snapshot_config.json
 
 # Other
 .tournament_slot_counter
+.init_uploaded
 data/*
 api
 .vercel

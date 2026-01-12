@@ -22,7 +22,16 @@ class GCSUploader:
         self.config = self._load_config(config_path)
         self.user_id = self.config.get("user_id")
         self.enabled = self.config.get("enabled", False)
-        self._session_counter = 0
+        
+        # Determine which slot to use based on whether init was uploaded
+        # Init uses slot 0, final uses slot 1
+        init_uploaded_file = Path(".init_uploaded")
+        if init_uploaded_file.exists():
+            self._session_slot = 1  # Final stage
+            self._stage = "final"
+        else:
+            self._session_slot = 0  # Init stage
+            self._stage = "init"
 
     def _load_config(self, config_path: str) -> Dict:
         """Load GCS configuration"""
@@ -93,14 +102,15 @@ class GCSUploader:
 
         try:
             session_urls = self.config.get("session_urls", [])
-            if not session_urls or self._session_counter >= len(session_urls):
+            if not session_urls or self._session_slot >= len(session_urls):
                 return {
                     "status": "error",
-                    "error": "No available upload slots. You may have exceeded the maximum number of recording sessions.",
+                    "error": f"No available upload slot for {self._stage} stage. "
+                    f"Expected slot {self._session_slot} but only {len(session_urls)} slots available.",
                 }
 
-            slot = session_urls[self._session_counter]
-            self._session_counter += 1
+            slot = session_urls[self._session_slot]
+            print(f"Using slot {self._session_slot} for {self._stage} stage")
 
             # Upload tarball
             with open(tarball_path, "rb") as f:

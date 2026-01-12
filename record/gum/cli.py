@@ -183,18 +183,34 @@ async def _main():
     print("=" * 70)
     print("[1/5] Setting up data directory...")
 
-    # Use data directory for database, screenshots go in data/screenshots
+    # Use data directory for database, screenshots go in data/{stage}/screenshots
     # Use absolute path to ensure consistency regardless of where script is run from
     import pathlib
 
     # Find project root: go up 3 levels from record/gum/cli.py -> record/gum/ -> record/ -> project root
     project_root = pathlib.Path(__file__).parent.parent.parent
-    data_directory = str(project_root / "data")
+    
+    # Determine which stage we're recording for
+    init_uploaded_file = project_root / ".init_uploaded"
+    if init_uploaded_file.exists():
+        # Init was already uploaded, record for final stage
+        stage = "final"
+    else:
+        # Init not uploaded yet, record for init stage
+        stage = "init"
+    
+    data_directory = str(project_root / "data" / stage)
+    screenshots_dir_default = f"data/{stage}/screenshots"
     
     # Convert screenshots_dir to absolute path relative to project root if it's relative
     screenshots_dir = args.screenshots_dir
+    if screenshots_dir == "data/screenshots":  # If using default, use stage-specific default
+        screenshots_dir = screenshots_dir_default
     if not os.path.isabs(screenshots_dir):
         screenshots_dir = str(project_root / screenshots_dir)
+    
+    print(f"Recording for {stage.upper()} stage")
+    print(f"Data directory: {data_directory}")
 
     # Collect all observers
     observers = []
@@ -344,9 +360,10 @@ async def _main():
         print("Recording stopped")
         print("=" * 70)
         print(f"\nData saved in: {data_directory}/")
+        print(f"Stage: {stage.upper()}")
         print("\nNext steps:")
         print("  1. Review recording:  python review_recording.py")
-        print("  2. Submit to GCS:     python submit.py")
+        print(f"  2. Submit to GCS:     python submit.py -s {stage} --snake_name YOUR_SNAKE_NAME")
         print("=" * 70)
 
 

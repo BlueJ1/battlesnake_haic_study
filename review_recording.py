@@ -11,7 +11,16 @@ app = Flask(__name__)
 
 # Global state - use absolute path relative to this script
 SCRIPT_DIR = Path(__file__).parent
-DATA_DIR = SCRIPT_DIR / "data"
+
+# Determine which stage to review
+init_uploaded = (SCRIPT_DIR / ".init_uploaded").exists()
+if init_uploaded and (SCRIPT_DIR / "data" / "final").exists():
+    DATA_DIR = SCRIPT_DIR / "data" / "final"
+    STAGE = "final"
+else:
+    DATA_DIR = SCRIPT_DIR / "data" / "init"
+    STAGE = "init"
+
 SCREENSHOTS_DIR = DATA_DIR / "screenshots"
 DB_PATH = DATA_DIR / "actions.db"
 
@@ -386,7 +395,7 @@ def main():
 
     parser = argparse.ArgumentParser(description="Review recording before submission")
     parser.add_argument(
-        "--data-dir", default="data", help="Directory containing recordings (default: data)"
+        "--data-dir", default=None, help="Directory containing recordings (auto-detects by default)"
     )
     parser.add_argument(
         "--port", type=int, default=5555, help="Port for web server (default: 5555)"
@@ -395,8 +404,26 @@ def main():
     args = parser.parse_args()
 
     # Update global paths
-    global DATA_DIR, SCREENSHOTS_DIR, DB_PATH
-    DATA_DIR = Path(args.data_dir).expanduser()
+    global DATA_DIR, SCREENSHOTS_DIR, DB_PATH, STAGE
+    
+    if args.data_dir:
+        # User specified directory, use it
+        DATA_DIR = Path(args.data_dir).expanduser()
+        STAGE = "custom"
+    else:
+        # Auto-detect based on init_uploaded marker
+        init_uploaded = (SCRIPT_DIR / ".init_uploaded").exists()
+        if init_uploaded and (SCRIPT_DIR / "data" / "final").exists():
+            DATA_DIR = SCRIPT_DIR / "data" / "final"
+            STAGE = "final"
+        elif (SCRIPT_DIR / "data" / "init").exists():
+            DATA_DIR = SCRIPT_DIR / "data" / "init"
+            STAGE = "init"
+        else:
+            # Fallback to legacy data/ directory
+            DATA_DIR = SCRIPT_DIR / "data"
+            STAGE = "legacy"
+    
     SCREENSHOTS_DIR = DATA_DIR / "screenshots"
     DB_PATH = DATA_DIR / "actions.db"
 
@@ -417,6 +444,7 @@ def main():
     print(f"\n{'='*70}")
     print("Recording Review Server")
     print(f"{'='*70}")
+    print(f"Stage:       {STAGE.upper()}")
     print(f"Screenshots: {len(screenshots)}")
     print(f"Data dir:    {DATA_DIR}")
     print(f"\nStarting web server on http://localhost:{args.port}")
