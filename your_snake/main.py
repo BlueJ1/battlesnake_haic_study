@@ -17,7 +17,6 @@ from survival_lookahead import (
     get_opponent_head_positions,
     get_possible_opponent_moves
 )
-from minimax import get_minimax_move, MinimaxSearch
 
 # Constants
 X = 'x'
@@ -388,30 +387,6 @@ def evaluate_center_preference(pos: typing.Dict, board_width: int, board_height:
     return 10 * (1 - distance_to_center / max_distance)
 
 
-def evaluate_tail_chase(pos: typing.Dict, my_body: typing.List, available_space: int,
-                        my_length: int) -> int:
-    """
-    Evaluate tail-chasing as a safe strategy.
-    Moving toward your own tail guarantees an escape route since tail moves away.
-    Only activates when space is limited.
-    """
-    if len(my_body) < 3:
-        return 0
-
-    my_tail = my_body[-1]
-    distance_to_tail = abs(pos[X] - my_tail[X]) + abs(pos[Y] - my_tail[Y])
-
-    # When space is very limited, prioritize staying close to tail
-    if available_space < my_length:
-        # Critical: chase tail aggressively
-        return 60 / (distance_to_tail + 1)
-    elif available_space < my_length * 2:
-        # Low space: moderate tail chase
-        return 25 / (distance_to_tail + 1)
-
-    return 0  # No tail chasing when space is plentiful
-
-
 def get_strategy_mode(my_health: int, my_length: int, opponents: typing.List) -> str:
     """Determine the current strategy mode based on game state."""
     if my_health < CRITICAL_HEALTH_THRESHOLD:
@@ -455,7 +430,7 @@ def move(game_state: typing.Dict) -> typing.Dict:
     is_critical = my_health < CRITICAL_HEALTH_THRESHOLD
     need_food = my_health < LOW_HEALTH_THRESHOLD
 
-    # Get safe moves using lookahead (for fallback)
+    # Get safe moves using lookahead
     lookahead_depth = 4
     safe_moves = []
     while lookahead_depth > 0:
@@ -482,22 +457,7 @@ def move(game_state: typing.Dict) -> typing.Dict:
             return {"move": emergency_moves[0]}
         return {"move": "down"}  # Last resort
 
-    # Use minimax with alpha-beta pruning for move selection
-    # Time limit: 300ms to stay well under the 500ms soft limit
-    minimax_move, minimax_score, depth_reached = get_minimax_move(game_state, time_limit_ms=300)
-
-    # Validate minimax result against safe moves
-    if minimax_move and minimax_move in safe_moves:
-        next_move = minimax_move
-        print(f"MOVE {game_state['turn']}: {next_move} | Mode: {mode} | "
-              f"Minimax Score: {minimax_score:.0f} | Depth: {depth_reached} | "
-              f"Health: {my_health}")
-        return {"move": next_move}
-
-    # Fallback to heuristic-based scoring if minimax fails or returns unsafe move
-    print(f"MOVE {game_state['turn']}: Minimax returned {minimax_move}, falling back to heuristics")
-
-    # Score each safe move using heuristics
+    # Score each safe move
     move_scores = {}
     move_spaces = {}
 
@@ -529,16 +489,13 @@ def move(game_state: typing.Dict) -> typing.Dict:
         # 6. Center preference (slight)
         score += evaluate_center_preference(next_pos, board_width, board_height)
 
-        # 7. Tail chasing (minimal improvement for survival)
-        score += evaluate_tail_chase(next_pos, my_body, available_space, my_length)
-
         move_scores[direction] = score
 
     # Choose the best move
     next_move = max(safe_moves, key=lambda m: move_scores[m])
 
     print(f"MOVE {game_state['turn']}: {next_move} | Mode: {mode} | "
-          f"Heuristic Score: {move_scores[next_move]:.0f} | Space: {move_spaces[next_move]} | "
+          f"Score: {move_scores[next_move]:.0f} | Space: {move_spaces[next_move]} | "
           f"Health: {my_health}")
 
     return {"move": next_move}
