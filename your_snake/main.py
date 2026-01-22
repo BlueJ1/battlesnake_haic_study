@@ -12,6 +12,16 @@
 
 import random
 import typing
+import numpy as np
+from survival_lookahead import move_survival_lookahead
+
+
+X = 'x'
+Y = 'y'
+LEFT = 'left'
+RIGHT = 'right'
+DOWN = 'down'
+UP = 'up'
 
 
 # info is called when you create your Battlesnake on play.battlesnake.com
@@ -22,7 +32,7 @@ def info() -> typing.Dict:
 
     return {
         "apiversion": "1",
-        "author": "",  # TODO: Your Battlesnake Username
+        "author": "shai-hulud",  # TODO: Your Battlesnake Username
         "color": "#888888",  # TODO: Choose color
         "head": "default",  # TODO: Choose head
         "tail": "default",  # TODO: Choose tail
@@ -43,52 +53,32 @@ def end(game_state: typing.Dict):
 # Valid moves are "up", "down", "left", or "right"
 # See https://docs.battlesnake.com/api/example-move for available data
 def move(game_state: typing.Dict) -> typing.Dict:
+    print(game_state.keys())
 
-    is_move_safe = {"up": True, "down": True, "left": True, "right": True}
-
-    # We've included code to prevent your Battlesnake from moving backwards
-    my_head = game_state["you"]["body"][0]  # Coordinates of your head
-    my_neck = game_state["you"]["body"][1]  # Coordinates of your "neck"
-
-    if my_neck["x"] < my_head["x"]:  # Neck is left of head, don't move left
-        is_move_safe["left"] = False
-
-    elif my_neck["x"] > my_head["x"]:  # Neck is right of head, don't move right
-        is_move_safe["right"] = False
-
-    elif my_neck["y"] < my_head["y"]:  # Neck is below head, don't move down
-        is_move_safe["down"] = False
-
-    elif my_neck["y"] > my_head["y"]:  # Neck is above head, don't move up
-        is_move_safe["up"] = False
-
-    # TODO: Step 1 - Prevent your Battlesnake from moving out of bounds
-    # board_width = game_state['board']['width']
-    # board_height = game_state['board']['height']
-
-    # TODO: Step 2 - Prevent your Battlesnake from colliding with itself
-    # my_body = game_state['you']['body']
-
-    # TODO: Step 3 - Prevent your Battlesnake from colliding with other Battlesnakes
-    # opponents = game_state['board']['snakes']
-
-    # Are there any safe moves left?
+    lookahead_depth = 4
     safe_moves = []
-    for move, isSafe in is_move_safe.items():
-        if isSafe:
-            safe_moves.append(move)
-
+    while lookahead_depth > 0:
+        safe_moves = move_survival_lookahead(game_state, lookahead_depth=lookahead_depth)
+        if len(safe_moves) > 0:
+            break
+        else:
+            lookahead_depth -= 1
     if len(safe_moves) == 0:
         print(f"MOVE {game_state['turn']}: No safe moves detected! Moving down")
         return {"move": "down"}
-
-    # Choose a random move from the safe ones
-    next_move = random.choice(safe_moves)
-
-    # TODO: Step 4 - Move towards food instead of random, to regain health and survive longer
-    # food = game_state['board']['food']
-
+    foods = game_state['board']['food']
+    my_head = game_state["you"]["body"][0]  # Coordinates of your head
+    my_x = my_head[X]
+    my_y = my_head[Y]
+    safe_moves_coordinates_to_directions = {coordinates: direction for direction, coordinates in
+                                            {LEFT: (my_x - 1, my_y), RIGHT: (my_x + 1, my_y), UP: (my_x, my_y + 1),
+                                             DOWN: (my_x, my_y - 1)}.items() if direction in safe_moves}
+    min_distance_from_food = np.array(
+        [[direction, min([abs(food[X] - coordinates[0]) + abs(food[Y] - coordinates[1]) for food in foods])] for
+         coordinates, direction in safe_moves_coordinates_to_directions.items()])
+    next_move = min_distance_from_food[np.argmin(min_distance_from_food[:, 1])][0]
     print(f"MOVE {game_state['turn']}: {next_move}")
+
     return {"move": next_move}
 
 
