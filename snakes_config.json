@@ -35,6 +35,6 @@
     "base_port": 7123,
     "tournament_settings": {
       "iterations_per_matchup": 100,
-      "workers": 6
+      "workers": 8
     }
   }
